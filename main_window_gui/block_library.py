@@ -6,7 +6,7 @@ from PySide2.QtWidgets import QTreeWidget, QTreeWidgetItem
 from base.base_scene_item import BaseSceneItem
 from base.block import Block
 from base.block_gui import BlockGUI
-from utils.block_lib_parser import BlockLibParser
+from utils.block_lib_loader import BlockLibParser
 
 
 class MyQTreeWidgetItem(QTreeWidgetItem):

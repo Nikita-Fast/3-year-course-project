@@ -28,33 +28,34 @@ class BlockGUI(QWidget):
 
         self.set_tool_bar()
 
-        self.add_fields_to_form()
+        self.add_params_to_form()
 
         self.tb.actionTriggered.connect(self.process_action)
 
     def process_action(self, action):
         if action == self.tb_actions['Ok']:
             """при нажатии кнопки Ок все введенные параметры передаются на валидацию"""
-            self.validate_fields()
+            self.validate_params()
         else:
             print('This action is not implemented')
 
-    def validate_fields(self):
-        for field_name, line_edit in self.line_edits.items():
+    def validate_params(self):
+        # todo отвязаться от line edit-a
+        for param_name, line_edit in self.line_edits.items():
             text = line_edit.text()
-            is_valid = self.block_implementation.receive_field_value_from_gui(field_name, text)
+            is_valid = self.block_implementation.receive_param_value_from_gui(param_name, text)
             if not is_valid:
                 line_edit.setPlaceholderText('Incorrect input!')
                 line_edit.clear()
 
-    def add_fields_to_form(self):
+    def add_params_to_form(self):
         if self.block_implementation is not None:
-            for field_name in self.block_implementation.get_field_names():
-                field_value = self.block_implementation.fields[field_name].data
-                line_edit = QLineEdit(str(field_value), self)
-                self.line_edits[field_name] = line_edit
-                self.layout().addRow(field_name, line_edit)
-        self.validate_fields()
+            for param_name in self.block_implementation.get_param_names():
+                param_value = self.block_implementation.params[param_name].data
+                line_edit = QLineEdit(str(param_value), self)
+                self.line_edits[param_name] = line_edit
+                self.layout().addRow(param_name, line_edit)
+        self.validate_params()
 
     def set_tool_bar(self):
         self.tb = QToolBar('Tools', self)

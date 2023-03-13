@@ -3,28 +3,31 @@
 # далее когда все блоки сохранили параметры, то можно будет генерировать код на выбранном языке
 from typing import List, Dict
 
-from utils.field import Field
+from base.port import Port
+from utils.parameter import Parameter
 
 
 class Block:
-    fields: Dict[str, Field]
+    params: Dict[str, Parameter]
 
-    def __init__(self, fields: List[Field]):
-        self.fields = {field.name: field for field in fields}
+    def __init__(self, fields: List[Parameter]):
+        self.params = {field.name: field for field in fields}
+        self.inputs = []
+        self.outputs = []
 
     def is_each_field_has_valid_value(self) -> bool:
         """Возвращает True, если все поля имеют валидное значение"""
-        return all(f.has_valid_data() for f in self.fields.values())
+        return all(f.has_valid_data() for f in self.params.values())
 
-    def get_field_names(self):
+    def get_param_names(self):
         """Возвращает список с именами всех полей. Можно использовать для создания формы на GUI блоке"""
-        return list(self.fields.keys())
+        return list(self.params.keys())
 
-    def receive_field_value_from_gui(self, field_name: str, value) -> bool:
+    def receive_param_value_from_gui(self, field_name: str, value) -> bool:
         """Метод получает значение поля от gui, валидирует его, если значение прошло валидацию,
         то оно сохраняется. Метод возвращает флаг, указывающий на то, прошло значение валидацию или нет"""
-        if field_name in self.fields:
-            status = self.fields[field_name].try_set_data(value)
+        if field_name in self.params:
+            status = self.params[field_name].try_set_data(value)
             print('validation')
             return status
         else:

@@ -8,6 +8,7 @@
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QMainWindow, QGraphicsView, QDockWidget
 
+from code_generators.draft import NaiveCodeGenerator
 from main_window_gui.block_library import BlockLibrary
 from main_window_gui.graphics_scene import BaseGraphicsScene
 from main_window_gui.menu_bar import MenuBar
@@ -44,6 +45,14 @@ class GUI(QMainWindow):
         # todo кошмарный доступ к имплементации
         if all(b.gui.block_implementation.is_each_field_has_valid_value() for b in self.scene.blocks):
             self.statusBar().showMessage('Модель валидна', 5000)
+            # for fun
+            for b in self.scene.blocks:
+                print(
+                    NaiveCodeGenerator.gen_obj_construction(
+                        type(b.gui.block_implementation),
+                        list(b.gui.block_implementation.params.values())
+                    )
+                )
 
     def add_graphics_scene(self):
         self.scene = BaseGraphicsScene()

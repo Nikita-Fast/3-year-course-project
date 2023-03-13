@@ -1,10 +1,10 @@
-from utils.field_validator import FieldValidator
+from validators.param_validator import ParameterValidator
 
 
-class Field:
+class Parameter:
     """Класс описывает поле. У него есть: имя, тип данных, данные, валидатор.
     """
-    def __init__(self, name: str, data_type: type, validator: FieldValidator, data=None):
+    def __init__(self, name: str, data_type: type, validator: ParameterValidator, data=None):
         self.name = name
         self.data_type = data_type
         self.data = data

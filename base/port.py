@@ -1,26 +1,28 @@
-from enum import Enum
-
-from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QGraphicsRectItem
+import uuid
 
 
-class PortType(Enum):
-    INPUT_PORT = 0
-    OUTPUT_PORT = 1
+class Port:
+    """
+    Это класс хранит данные и имеет уникальный номер. Его задача аккумулировать данные.
+    Блок берет данные из порта или кладет в него. Здесь есть тонкий момент: предполагается что каждый блок
+    на своем входе имеет заданный объем данных (или кратный чему-то).
+    """
+    def __init__(self, data_portion_size: int, data_type=type):
+        self.buffer = []
+        self.id = uuid.uuid4()
 
+        self.data_type = data_type
+        self.data_portion_size = data_portion_size
 
-class Port(QGraphicsRectItem):
+    def put(self, data: list):
+        self.buffer += data
 
-    def __init__(self, port_type: PortType, parent=None):
-        super().__init__(parent)
+    def get(self, num_elements):
+        if len(self.buffer) < num_elements:
+            return []
+        output = self.buffer[:num_elements]
+        self.buffer[:num_elements] = []
+        return output
 
-        self.port_type = port_type
-
-        self.set_size()
-        self.set_brush()
-
-    def set_size(self):
-        self.setRect(0, 0, 40, 40)
-
-    def set_brush(self):
-        self.setBrush(Qt.red)
+    def is_data_available(self):
+        return len(self.buffer) > 0

@@ -1,12 +1,12 @@
 from typing import List
 
 from base.block import Block
-from utils.field import Field
-from utils.field_validator import IntFieldValidator
+from utils.parameter import Parameter
+from validators.param_validator import IntParameterValidator
 
 
 class BinaryGenerator(Block):
     def __init__(self):
-        field = Field('bits_num', int, IntFieldValidator())
+        field = Parameter('bits_num', int, IntParameterValidator())
         super().__init__([field])
 

@@ -24,6 +24,7 @@ class BlockLibParser:
             """
         if block_requirements is None:
             block_requirements = BlockLibParser.default_block_requirements()
+
         self.block_requirements = block_requirements
 
     def parse(self):
@@ -32,7 +33,6 @@ class BlockLibParser:
         for folder_name in os.listdir(directory):
             folder = os.path.join(directory, folder_name)
             if os.path.isdir(folder):
-                # print(folder_name)
 
                 requirements_implementation = self.parse_folder(folder)
                 if requirements_implementation is not None:
@@ -56,9 +56,13 @@ class BlockLibParser:
         return [cls_obj for cls_name, cls_obj in inspect.getmembers(sys.modules[file]) if
                 inspect.isclass(cls_obj)]
 
+    @staticmethod
+    def import_py_file(file: str):
+        exec('import ' + file)
+
     def parse_folder(self, dir_path: str):
-        """Если в папке есть набор файлов, содержащие все необходимые для описания блока классы
-        (эти классы перечисленны в readme.txt), то добавляем классы в словарь, чтобы потом можно было
+        """Если в папке есть набор файлов, содержащие все классы необходимые для описания блока
+        (эти классы перечисленны в self.block_requirements), то добавляем классы в словарь, чтобы потом можно было
         подргузить в либу блоков"""
 
         satisfied_requirements = {cls: None for cls in self.block_requirements}
@@ -70,7 +74,7 @@ class BlockLibParser:
             file = os.path.join(dir_path, file_name)
             if BlockLibParser.is_python_file(file):
                 file = BlockLibParser.prepare_py_file_for_import(file)
-                exec('import ' + file)
+                BlockLibParser.import_py_file(file)
                 classes = BlockLibParser.get_classes_from_module(file)
 
                 for cls in classes:
@@ -78,8 +82,7 @@ class BlockLibParser:
                         if req_cls in cls.__bases__:
                             satisfied_requirements[req_cls] = cls
 
-        if all(v is not None for v in satisfied_requirements.values()):
-            # print('папка %s содержит все нужные файлы' % dir_path)
+        if all(cls is not None for cls in satisfied_requirements.values()):
             return satisfied_requirements
         else:
             return None

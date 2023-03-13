@@ -1,5 +1,5 @@
 
-class FieldValidator:
+class ParameterValidator:
     """Предназначен для валидации одного конкретного поля у блока"""
     def __init__(self):
         pass
@@ -8,7 +8,7 @@ class FieldValidator:
         pass
 
 
-class IntFieldValidator(FieldValidator):
+class IntParameterValidator(ParameterValidator):
 
     def is_valid(self, value) -> bool:
         try:
