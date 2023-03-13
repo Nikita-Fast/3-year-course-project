@@ -1,7 +1,9 @@
-from PySide2.QtCore import Qt
+import PySide2
+from PySide2.QtCore import Qt, Signal, QObject
 from PySide2.QtWidgets import QGraphicsRectItem, QGraphicsItem, QGraphicsTextItem
 
-from port import Port
+from base.block_gui import BlockGUI
+from base.port import Port
 
 
 class BaseSceneItem(QGraphicsRectItem):
@@ -10,9 +12,21 @@ class BaseSceneItem(QGraphicsRectItem):
     def __init__(self, parent: QGraphicsItem = None):
         super().__init__(parent)
 
+        self.gui: BlockGUI = None
         self.name: QGraphicsTextItem = None
-        self.set_size()
+
+        self.setup_appearance()
         self.set_flags()
+
+    def mouseDoubleClickEvent(self, event: PySide2.QtWidgets.QGraphicsSceneMouseEvent) -> None:
+        if self.gui is not None:
+            self.gui.show()
+
+    def add_gui_object(self, gui_obj: BlockGUI):
+        self.gui = gui_obj
+
+    def setup_appearance(self):
+        self.set_size()
         self.set_brush()
         self.set_name('BaseItem')
 

@@ -6,14 +6,15 @@ import sys
 from enum import Enum
 from typing import List
 
-from base_scene_item import BaseSceneItem
-from block_gui import BlockGUI
+from base.base_scene_item import BaseSceneItem
+from base.block import Block
+from base.block_gui import BlockGUI
 
 
 class BlockLibParser:
     """Класс отвечающий за парсинг библиотечных блоков"""
 
-    def __init__(self, block_requirements: List):
+    def __init__(self, block_requirements: List = None):
         """Конструктор
 
             Parameters
@@ -21,6 +22,8 @@ class BlockLibParser:
             block_requirements: List
                 Список классов, которые должны быть реализованы в наборе файлов, описывающих блок
             """
+        if block_requirements is None:
+            block_requirements = BlockLibParser.default_block_requirements()
         self.block_requirements = block_requirements
 
     def parse(self):
@@ -29,13 +32,16 @@ class BlockLibParser:
         for folder_name in os.listdir(directory):
             folder = os.path.join(directory, folder_name)
             if os.path.isdir(folder):
-                print(folder_name)
+                # print(folder_name)
 
                 requirements_implementation = self.parse_folder(folder)
                 if requirements_implementation is not None:
                     parsed_blocks[folder_name] = requirements_implementation
         return parsed_blocks
 
+    @staticmethod
+    def default_block_requirements():
+        return [Block, BlockGUI, BaseSceneItem]
 
     @staticmethod
     def is_python_file(file: str):
@@ -73,7 +79,7 @@ class BlockLibParser:
                             satisfied_requirements[req_cls] = cls
 
         if all(v is not None for v in satisfied_requirements.values()):
-            print('папка %s содержит все нужные файлы' % dir_path)
+            # print('папка %s содержит все нужные файлы' % dir_path)
             return satisfied_requirements
         else:
             return None

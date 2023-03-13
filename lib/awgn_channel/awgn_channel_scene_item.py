@@ -1,5 +1,5 @@
-from base_scene_item import BaseSceneItem
-from port import Port, PortType
+from base.base_scene_item import BaseSceneItem
+from base.port import Port, PortType
 
 
 class AWGNChannelSceneItem(BaseSceneItem):

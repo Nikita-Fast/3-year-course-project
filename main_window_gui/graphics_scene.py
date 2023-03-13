@@ -6,18 +6,19 @@ from PySide2.QtCore import Qt
 from PySide2.QtGui import QPen, QBrush
 from PySide2.QtWidgets import QGraphicsScene, QGraphicsItem, QTreeWidgetItem
 
-from base_scene_item import BaseSceneItem
-from base_scene_widget import BaseSceneWidget
+from base.base_scene_item import BaseSceneItem
 
 
 class BaseGraphicsScene(QGraphicsScene):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.blocks = []
 
     def add_block(self, block: BaseSceneItem):
         """добавить на сцену блок"""
         self.addItem(block)
+        self.blocks.append(block)
         pass
 
     def remove_block(self, block):
