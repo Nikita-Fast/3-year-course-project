@@ -14,66 +14,84 @@ from validators.connection_scene_item_validator import ConnectionSceneItemValida
 
 
 class BaseGraphicsScene(QGraphicsScene):
+    """Описание графической сцены с блоками и соединениями"""
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.curr_connection: ConnectionSceneItem = None
+        self.new_connection: ConnectionSceneItem = None
         self.blocks = []
 
     def mousePressEvent(self, event: PySide2.QtWidgets.QGraphicsSceneMouseEvent) -> None:
         if event.button() == Qt.LeftButton:
             if self.is_port_under_mouse(event):
-                port = self.get_port_under_mouse(event)
-
-                if port.is_connected():
-                    return
-                else:
-                    self.curr_connection = ConnectionSceneItem(event.scenePos(), event.scenePos())
-
-                    port.connection = self.curr_connection
-                    self.curr_connection.source_port = port
-
-                    self.addItem(self.curr_connection)
-                    return
+                self.port_clicked(event)
+                return
         super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event: PySide2.QtWidgets.QGraphicsSceneMouseEvent) -> None:
-        if self.curr_connection is not None:
-            self.curr_connection.update_dst_pos(event.scenePos())
+        if self.new_connection is not None:
+            self.new_connection.update_dst_pos(event.scenePos())
         super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event: PySide2.QtWidgets.QGraphicsSceneMouseEvent) -> None:
-        if self.curr_connection is not None:
+        if self.new_connection is not None:
             if self.is_port_under_mouse(event):
                 dst_port = self.get_port_under_mouse(event)
-
-                if dst_port.is_connected():
-                    self.remove_cur_connection()
-                else:
-                    dst_port.connection = self.curr_connection
-                    self.curr_connection.dst_port = dst_port
-
-                    is_valid = ConnectionSceneItemValidator.is_valid(self.curr_connection)
-                    if not is_valid:
-                        self.remove_cur_connection()
+                self.connect_dst_port(dst_port)
             else:
-                if self.curr_connection is not None:
-                    self.remove_cur_connection()
+                self.remove_new_connection()
 
-        self.curr_connection = None
+        self.new_connection = None
         super().mouseReleaseEvent(event)
 
-    def remove_cur_connection(self):
-        self.curr_connection.remove_from_ports()
-        self.removeItem(self.curr_connection)
+    def connect_source_port(self, port: PortSceneItem, event: PySide2.QtWidgets.QGraphicsSceneMouseEvent):
+        """Создаем соединение исходящее из переданного порта источника"""
+        self.new_connection = ConnectionSceneItem(
+            event.scenePos(),
+            event.scenePos(),
+            source_port=port)
+        port.connection = self.new_connection
+
+    def port_clicked(self, event: PySide2.QtWidgets.QGraphicsSceneMouseEvent):
+        """Обработка нажатия мышью на порт"""
+        port = self.get_port_under_mouse(event)
+
+        if not port.is_connected():
+            self.connect_source_port(port, event)
+            self.addItem(self.new_connection)
+
+    def connect_dst_port(self, dst_port: PortSceneItem):
+        """Пробуем подключить соединение к порту назначения"""
+        if dst_port.is_connected():
+            self.remove_new_connection()
+        else:
+            dst_port.connection = self.new_connection
+            self.new_connection.dst_port = dst_port
+
+            self.validate_new_connection()
+
+    def validate_new_connection(self):
+        """Удаляет только что созданное соединение, если оно не валидно"""
+        is_valid = ConnectionSceneItemValidator.is_valid(self.new_connection)
+        if not is_valid:
+            self.remove_new_connection()
+
+    def remove_new_connection(self):
+        """корректное удаление объекта ConnectionSceneItem. Ранее подключенные порты не должны более
+        ссылаться на это соединение. Само соединение нужно убрать со сцены"""
+        self.new_connection.remove_from_ports()
+        self.removeItem(self.new_connection)
 
     def is_port_under_mouse(self, event: PySide2.QtWidgets.QGraphicsSceneMouseEvent):
+        """Возвращает True, если кликнули мышью по порту"""
         items = self.items(event.scenePos())
         if len(items) > 0:
             return any(isinstance(item, PortSceneItem) for item in items)
         return False
 
     def get_port_under_mouse(self, event: PySide2.QtWidgets.QGraphicsSceneMouseEvent):
+        """Возвращает порт на который кликнули мышью. Если порты блоков накладываются
+        друг на друга, то вернется порты, визуально лежащий на верхнем слое"""
         for item in self.items(event.scenePos()):
             if isinstance(item, PortSceneItem):
                 return item

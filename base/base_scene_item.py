@@ -9,7 +9,8 @@ from base.port_scene_item import PortSceneItem
 
 
 class BaseSceneItem(QGraphicsRectItem):
-    """Класс описывает графическое представление блоков на самой сцене"""
+    """Класс описывает графическое представление блоков на самой сцене
+    """
 
     def __init__(self, parent: QGraphicsItem = None):
         super().__init__(parent)

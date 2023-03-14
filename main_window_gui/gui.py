@@ -58,7 +58,7 @@ class GUI(QMainWindow):
         self.scene = BaseGraphicsScene()
         self.view = QGraphicsView(self.scene, self)
         self.view.setGeometry(0, 0, 2000, 2000)
-        self.view.setMinimumSize(500, 400)
+        self.view.setMinimumSize(900, 700)
         self.setCentralWidget(self.view)
 
     def add_tool_bar(self):
