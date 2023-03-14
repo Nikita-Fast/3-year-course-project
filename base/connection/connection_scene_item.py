@@ -1,4 +1,4 @@
-from PySide2.QtCore import QLineF, QPointF
+from PySide2.QtCore import QLineF
 from PySide2.QtWidgets import QGraphicsLineItem, QGraphicsItem
 
 from typing import TYPE_CHECKING
@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from validators.port_scene_items_connection_validator import PortSceneItemsConnectionValidator
 
 if TYPE_CHECKING:
-    from base.port_scene_item import PortSceneItem
+    from base.port.port_scene_item import PortSceneItem
 
 
 class BaseConnectionGraphicsComponent(QGraphicsItem):

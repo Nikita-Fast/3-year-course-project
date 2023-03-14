@@ -1,9 +1,9 @@
 from typing import TYPE_CHECKING
 
-from base.port_type import PortType
+from base.port.port_type import PortType
 
 if TYPE_CHECKING:
-    from base.port_scene_item import PortSceneItem
+    from base.port.port_scene_item import PortSceneItem
 
 
 def is_ports_free(source: "PortSceneItem", destination: "PortSceneItem"):

@@ -1,13 +1,12 @@
-import uuid
-from typing import Dict, List
+from typing import List
 
-from base.block import Block
-from base.connection import Connection
+from base.block.block_description import BlockDescription
+from base.connection.connection_implementation import ConnectionImplementation
 
 
 class Model:
 
     def __init__(self):
-        self.blocks: List[Block] = []
-        # uuid порта сопоставляется с соединением
-        self.connections: Dict[uuid, Connection] = {}
+        self.blocks: List[BlockDescription] = []
+        # нужен ли?
+        self.connections: List[ConnectionImplementation] = []

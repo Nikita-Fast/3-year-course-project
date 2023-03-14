@@ -3,15 +3,15 @@ import inspect
 import os
 # from lib.binary_generator.binary_generator_scene_item import *
 import sys
-from enum import Enum
 from typing import List
 
-from base.base_scene_item import BaseSceneItem
-from base.block import Block
-from base.block_gui import BlockGUI
+from base.block.block_implementation import BlockImplementation
+from base.block.block_scene_item import BlockSceneItem
+from base.block.block_description import BlockDescription
+from base.block.block_gui import BlockGUI
 
 
-class BlockLibParser:
+class BlockLibLoader:
     """Класс отвечающий за парсинг библиотечных блоков"""
 
     def __init__(self, block_requirements: List = None):
@@ -23,7 +23,7 @@ class BlockLibParser:
                 Список классов, которые должны быть реализованы в наборе файлов, описывающих блок
             """
         if block_requirements is None:
-            block_requirements = BlockLibParser.default_block_requirements()
+            block_requirements = BlockLibLoader.default_block_requirements()
 
         self.block_requirements = block_requirements
 
@@ -41,7 +41,7 @@ class BlockLibParser:
 
     @staticmethod
     def default_block_requirements():
-        return [Block, BlockGUI, BaseSceneItem]
+        return [BlockDescription, BlockGUI, BlockSceneItem, BlockImplementation]
 
     @staticmethod
     def is_python_file(file: str):
@@ -60,6 +60,22 @@ class BlockLibParser:
     def import_py_file(file: str):
         exec('import ' + file)
 
+    @staticmethod
+    def find_implementation_cls(folder_path: str):
+        if not os.path.isdir(folder_path):
+            raise Exception('путь должен указывать на папку')
+        for file_name in os.listdir(folder_path):
+            file = os.path.join(folder_path, file_name)
+            if BlockLibLoader.is_python_file(file):
+                file = BlockLibLoader.prepare_py_file_for_import(file)
+                BlockLibLoader.import_py_file(file)
+                classes = BlockLibLoader.get_classes_from_module(file)
+
+                for cls in classes:
+                    if BlockImplementation in cls.__bases__:
+                        return cls
+
+
     def parse_folder(self, dir_path: str):
         """Если в папке есть набор файлов, содержащие все классы необходимые для описания блока
         (эти классы перечисленны в self.block_requirements), то добавляем классы в словарь, чтобы потом можно было
@@ -72,10 +88,10 @@ class BlockLibParser:
             raise Exception('переданный путь должен указывать на папку')
         for file_name in os.listdir(dir_path):
             file = os.path.join(dir_path, file_name)
-            if BlockLibParser.is_python_file(file):
-                file = BlockLibParser.prepare_py_file_for_import(file)
-                BlockLibParser.import_py_file(file)
-                classes = BlockLibParser.get_classes_from_module(file)
+            if BlockLibLoader.is_python_file(file):
+                file = BlockLibLoader.prepare_py_file_for_import(file)
+                BlockLibLoader.import_py_file(file)
+                classes = BlockLibLoader.get_classes_from_module(file)
 
                 for cls in classes:
                     for req_cls in self.block_requirements:

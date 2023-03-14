@@ -1,4 +1,4 @@
-from base.block_gui import BlockGUI
+from base.block.block_gui import BlockGUI
 
 
 class AWGNChannelGUI(BlockGUI):

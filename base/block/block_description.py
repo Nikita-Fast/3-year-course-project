@@ -1,19 +1,22 @@
-# базовый класс реализации блока
-# задачи: принять параметры от GUI, помочь с их валидацией и сохранить валидные параметры внутри себя
-# далее когда все блоки сохранили параметры, то можно будет генерировать код на выбранном языке
+
 from typing import List, Dict
 
-from base.port import Port
 from utils.parameter import Parameter
 
 
-class Block:
+class BlockDescription:
+    """
+    базовый класс описания блока
+    задачи: принять параметры от GUI, помочь с их валидацией и сохранить валидные параметры внутри себя.
+    Передать сохраненные параметры в кодогенератор
+    """
     params: Dict[str, Parameter]
 
     def __init__(self, fields: List[Parameter]):
         self.params = {field.name: field for field in fields}
-        self.inputs = []
-        self.outputs = []
+
+    def get_params(self):
+        return list(self.params.values())
 
     def is_each_field_has_valid_value(self) -> bool:
         """Возвращает True, если все поля имеют валидное значение"""

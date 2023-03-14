@@ -1,11 +1,12 @@
+from typing import List
 
 import PySide2
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QGraphicsScene
 
-from base.base_scene_item import BaseSceneItem
-from base.connection_scene_item import ConnectionSceneItemDraft
-from base.port_scene_item import PortSceneItem
+from base.block.block_scene_item import BlockSceneItem
+from base.connection.connection_scene_item import ConnectionSceneItemDraft
+from base.port.port_scene_item import PortSceneItem
 
 
 class BaseGraphicsScene(QGraphicsScene):
@@ -13,7 +14,8 @@ class BaseGraphicsScene(QGraphicsScene):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.blocks = []
+        self.blocks: List[BlockSceneItem] = []
+        self.connections: List[ConnectionSceneItemDraft] = []
         self.clicked_port: PortSceneItem = None
 
     def mousePressEvent(self, event: PySide2.QtWidgets.QGraphicsSceneMouseEvent) -> None:
@@ -63,7 +65,7 @@ class BaseGraphicsScene(QGraphicsScene):
             if isinstance(item, PortSceneItem):
                 return item
 
-    def add_block(self, block: BaseSceneItem):
+    def add_block(self, block: BlockSceneItem):
         """добавить на сцену блок"""
         self.addItem(block)
         self.blocks.append(block)
@@ -71,6 +73,7 @@ class BaseGraphicsScene(QGraphicsScene):
 
     def remove_block(self, block):
         """убрать блок со сцены"""
+        self.blocks.remove(block)
         self.items().remove(block)
         pass
 
@@ -79,7 +82,20 @@ class BaseGraphicsScene(QGraphicsScene):
         За корректное создание соединений пусть отвечает кто-то другой, потому что процесс это не простой и
         наверное может иметь несколько вариантов решения
         """
+        self.connections.append(connection)
         self.addItem(connection)
 
     def remove_connection(self, connection: ConnectionSceneItemDraft):
+        self.connections.remove(connection)
         connection.remove()
+
+    def is_all_blocks_hava_valid_params(self):
+        return all(b.get_description().is_each_field_has_valid_value() for b in self.blocks)
+
+    def pass_blocks_and_params(self):
+        blocks = self.blocks
+        params = []
+        for b in self.blocks:
+            block_params = b.get_description().get_params()
+            params.append(block_params)
+        return blocks, params
