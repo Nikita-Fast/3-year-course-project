@@ -43,7 +43,7 @@ class GUI(QMainWindow):
     def start_button_clicked(self):
         """Выполнить весь сгенированный код"""
         if os.path.isfile('generated/model_code.py'):
-            import generated.model_code
+            exec(open('generated/model_code.py').read())
 
     def magic_button_clicked(self):
         """запустить валидацию модели.
