@@ -1,16 +1,19 @@
 import numpy as np
 
 from base.block.block_implementation import BlockImplementation
+from lib.qam_modulator import default_qam_constellations
 from lib.qam_modulator.implementation import QAMModulator
 
 
 class QAMDemodulator(BlockImplementation):
 
-    def __init__(self, bits_per_symbol, constellation, mode='hard'):
+    def __init__(self, bits_per_symbol, constellation=None, mode='hard'):
         super().__init__(1, 1)
         self.bits_per_symbol = bits_per_symbol
         self.constellation = constellation
         self.mode = mode
+        if constellation is None:
+            self.constellation = default_qam_constellations.get_qam_constellation[bits_per_symbol]
 
     def _execute_(self):
         data = self.inputs[0].get()

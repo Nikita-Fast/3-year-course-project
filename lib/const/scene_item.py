@@ -9,7 +9,7 @@ class ConstSceneItem(BlockSceneItem):
         super().__init__(parent)
 
         self.add_output(PortSceneItem(PortType.OUTPUT_PORT, block=self, number=0), 100)
-        self.set_name('Const')
+        self.set_name('Ebn0_db')
 
         # todo хочется без агрегации. Действительно ли хочется?
         self.block_gui = ConstGUI()
