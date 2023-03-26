@@ -8,7 +8,8 @@ class BinaryGeneratorSceneItem(BlockSceneItem):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.add_output(PortSceneItem(PortType.OUTPUT_PORT, block=self, number=0), 100)
+        self.add_output(PortSceneItem(PortType.OUTPUT_PORT, block=self, number=0), 50)
+        self.add_output(PortSceneItem(PortType.OUTPUT_PORT, block=self, number=1), 150)
         self.set_name('Binary generator')
 
         # todo хочется без агрегации. Действительно ли хочется?

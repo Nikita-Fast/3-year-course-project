@@ -11,6 +11,10 @@ class ConnectionImplementation:
         self.source = port_source
         self.destination = port_destination
         self.id = uuid.uuid4()
+        # todo ошибка ли делать так?
+        self.source.connect(self)
+        self.destination.connect(self)
 
     def flush(self):
-        self.destination.put(self.source.get(len(self.source.buffer)))
+        all_data = self.source.get(len(self.source.buffer))
+        self.destination.put(all_data)

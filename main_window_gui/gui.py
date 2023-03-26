@@ -4,6 +4,7 @@
 # 2) сцены
 # 3) панели инструментов
 # 4) панели состояния
+import os.path
 
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QMainWindow, QGraphicsView, QDockWidget
@@ -36,6 +37,13 @@ class GUI(QMainWindow):
     def tool_bar_action_handler(self, action):
         if action.text() == 'пыщ':
             self.magic_button_clicked()
+        if action.text() == 'start':
+            self.start_button_clicked()
+
+    def start_button_clicked(self):
+        """Выполнить весь сгенированный код"""
+        if os.path.isfile('generated/model_code.py'):
+            exec(open('generated/model_code.py').read())
 
     def magic_button_clicked(self):
         """запустить валидацию модели.
