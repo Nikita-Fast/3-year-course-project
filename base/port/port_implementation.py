@@ -19,7 +19,6 @@ class PortImplementation:
         self.id = uuid.uuid4()
         self.block = block
         self.number = number
-
         self.data_type = data_type
         # self.data_portion_size = data_portion_size
         self.connection: ConnectionImplementation = None
@@ -36,7 +35,9 @@ class PortImplementation:
     def put(self, data: list):
         self.buffer += data
 
-    def get(self, num_elements):
+    def get(self, num_elements=None):
+        if num_elements is None:
+            num_elements = len(self.buffer)
         if len(self.buffer) < num_elements:
             return []
         output = self.buffer[:num_elements]

@@ -41,17 +41,50 @@ class NaiveCodeGenerator:
             s = self.gen_block_creation2(b, b_params)
             code_lines.append(s)
 
+        # создаем список со всеми блоками
+        code_lines.append(
+            'blocks = [{}]'.format(', '.join(self.block_var_names))
+        )
+
         code_lines.append('')
 
         # connections
         for b in blocks:
             for port in b.inputs + b.outputs:
                 if port.is_connected():
+                    print('connected port')
                     if port.connection not in self.scene_connection_to_var_name:
                         s = self.gen_connection_construction(port.connection)
                         code_lines.append(s)
 
+        code_lines.append('')
+
+        # моделирование
+        # заполнить front блоками источниками
+        init_front = ['front = set()', 'for b in blocks:', '\tif b.is_source_block():', '\t\tfront.add(b)']
+        code_lines.append('\n'.join(init_front))
+
+        code_lines.append('')
+
+        # обход модели
+        code_lines.append(NaiveCodeGenerator.gen_model_traversal())
+
         return '\n'.join(code_lines)
+
+    @staticmethod
+    def gen_model_traversal():
+        lines = [
+            'while True:',
+            '\tnew_front = set()',
+            '\tfor b in front:',
+            '\t\tb.execute()',
+            '\t\tnew_front.update(b.get_children())',
+            '\tif new_front:',
+            '\t\tfront = new_front',
+            '\telse:',
+            '\t\tbreak'
+        ]
+        return '\n'.join(lines)
 
     @staticmethod
     def gen_connection_import():

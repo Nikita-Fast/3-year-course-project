@@ -18,6 +18,24 @@ class BlockImplementation(ABC):
         # self.output_buffer = None
         self.id = uuid.uuid4()
 
+    def get_children(self):
+        children = set()
+        for p in self.outputs:
+            if p.is_connected():
+                children.add(p.connection.destination.block)
+        return children
+
+    def is_source_block(self):
+        return len(self.inputs) == 0 and len(self.outputs) > 0
+
+    def is_final_block(self):
+        return len(self.inputs) > 0 and len(self.outputs) == 0
+
+    def _pass_data(self):
+        for p in self.outputs:
+            if p.is_connected():
+                p.connection.flush()
+
     def execute(self):
         """
         Блоку все равно, что происходит вне него. Он производит обработку данных если данных на входе у него достаточно.
@@ -28,6 +46,7 @@ class BlockImplementation(ABC):
             input_data_available = input_data_available and p.is_data_available()
         if input_data_available:
             self._execute_()
+            self._pass_data()
 
     @abstractmethod
     def _execute_(self):
